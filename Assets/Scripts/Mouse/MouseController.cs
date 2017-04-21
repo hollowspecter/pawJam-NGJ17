@@ -6,15 +6,13 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 public class MouseController : MonoBehaviour {
 
+    [Range(1,2)]
+    [SerializeField]
+    private int m_iControllerNumber = 1;
     [SerializeField]
     private Text m_debugText;
     [SerializeField]
     private float m_fSpeed;
-    [SerializeField]
-    private float m_fAxisThreshold;
-    [Range(0f, 1f)]
-    [SerializeField]
-    private float m_fMinimumSpeedfactor = 0.5f;
     [SerializeField]
     private bool m_bMoveByForce = false;
     [SerializeField]
@@ -31,8 +29,8 @@ public class MouseController : MonoBehaviour {
 	
 	void FixedUpdate () {
         // fetch movement from axis
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float h = Input.GetAxis("Horizontal_" + m_iControllerNumber);
+        float v = Input.GetAxis("Vertical_" + m_iControllerNumber);
 
         bool walking = h != 0f || v != 0f;
         Move(h, v);
@@ -63,5 +61,10 @@ public class MouseController : MonoBehaviour {
             Quaternion newRotation = Quaternion.LookRotation(movement);
             m_rigid.MoveRotation(newRotation);
         }
+    }
+
+    public void Kill()
+    {
+        Destroy(gameObject);
     }
 }
