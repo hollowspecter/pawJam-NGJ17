@@ -65,6 +65,7 @@ public class MiceManager : MonoBehaviour {
             {
                 // LOAD GAME HERE
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); // simply loads the scene after this
+                
             }
         }
     }
