@@ -8,14 +8,21 @@ public class PickUp : MonoBehaviour {
     {
         if (c.CompareTag("Mouse"))
         {
-            Activate();
-            Destroy(gameObject);
+            StartCoroutine(Activate());
+            Destroy(GetComponent<Collider>());
+            Destroy(GetComponentInChildren<MeshRenderer>());
         }
     }
 
-    void Activate()
+    IEnumerator Activate()
     {
-        // do the action here
-        print("pickup");
+        float time = CONSTANTS.SCRAMBLED_KEYS_TIME;
+        GridCreator.Instance.assignKeys(GridCreator.Instance.scrambledKeys);
+        while(time > 0.0f) {
+            Debug.Log(time);
+            yield return null;
+            time -= Time.deltaTime;
+        }
+        GridCreator.Instance.assignKeys(GridCreator.Instance.baseKeys);
     }
 }

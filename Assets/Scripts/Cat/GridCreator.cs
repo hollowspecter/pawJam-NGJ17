@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GridCreator :MonoBehaviour {
-
+    public static GridCreator Instance;
 
     public Rect levelSize;
 
@@ -18,17 +18,25 @@ public class GridCreator :MonoBehaviour {
         }
     }
 
-    static private string[,] baseKeys = new string[,] {
+    public string[,] baseKeys = new string[,] {
         { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
         { "q", "w", "e", "r", "t", "z", "u", "i", "o" },
         { "a", "s", "d", "f", "g", "h", "j", "k", "l" },
         { "y", "x", "c", "v", "b", "n", "m", ",", "." }
     };
 
-
+    public string[,] scrambledKeys = new string[,] {
+        { "9", "8", "7", "6", "5", "4", "3", "2", "1" },
+        { "o", "i", "u", "z", "t", "r", "e", "w", "q" },
+        { "l", "k", "j", "h", "g", "f", "d", "s", "a" },
+        { ".", ",", "m", "n", "b", "v", "c", "x", "y" }
+    };
 
     // Use this for initialization
     void Start () {
+        if (Instance == null) Instance = this;
+        else Destroy(this);
+
         m_cells = new ArrayList();
 
         //Dimensions because 1x1x1 Plane is actually 10 long
