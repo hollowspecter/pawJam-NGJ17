@@ -36,6 +36,7 @@ public class PickUpSpawner : MonoBehaviour {
 
             GameObject pickup = Instantiate<GameObject>(m_prefabPickUp);
             pickup.transform.position = randomCell.position;
+            pickup.transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0f, 360f), 0f));
              
             // set a new timer for the next cooldown
             timer = Random.Range(m_minMaxSpawnCooldown.x, m_minMaxSpawnCooldown.y);
