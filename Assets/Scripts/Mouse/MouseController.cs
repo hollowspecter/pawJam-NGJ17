@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 public class MouseController : MonoBehaviour {
 
-    [Range(1,2)]
+    //[Range(1,4)]
     [SerializeField]
     private int m_iControllerNumber = 1;
     [SerializeField]
@@ -34,12 +34,11 @@ public class MouseController : MonoBehaviour {
         m_transform = GetComponent<Transform>();
     }
 
-    void Start()
+    void SpawnLaser()
     {
         laser = Instantiate<GameObject>(m_prefabLaser);
         laser.transform.position = new Vector3(m_transform.position.x, laserHeight, m_transform.position.z);
         laser.GetComponentInChildren<LaserController>().SetMouseTransform(m_transform);
-        laser.SetActive(false);
     }
 
     void OnCollisionEnter(Collision c)
@@ -90,11 +89,16 @@ public class MouseController : MonoBehaviour {
     {
         dead = true;
 
-        laser.SetActive(true);
+        SpawnLaser();
 
         // turn of mesh renderers and colliders
         GetComponent<MeshRenderer>().enabled = false;
         transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
         GetComponent<Collider>().enabled = false;
+    }
+
+    public void SetPlayerNumber(int number)
+    {
+        m_iControllerNumber = number;
     }
 }
