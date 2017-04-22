@@ -19,7 +19,7 @@ public class Tail : MonoBehaviour {
 
     void Awake()
     {
-        m_points = new FixedSizeQueue<Vector3>(20);
+        m_points = new FixedSizeQueue<Vector3>(m_iNumberOfTailpoints);
         m_line = GetComponent<LineRenderer>();
         Assert.IsNotNull<LineRenderer>(m_line);
         m_transform = transform;
