@@ -30,6 +30,7 @@ public class MouseController : MonoBehaviour {
     public bool Dead { get { return dead; } }
     private bool dead = false;
     private GameObject laser;
+    private float h = 0f, v = 0f;
 
     public static int MiceAlive { get { return miceAlive; } }
     private static int miceAlive = 0;
@@ -61,7 +62,6 @@ public class MouseController : MonoBehaviour {
         {
             //bump!
             c.rigidbody.AddForce(transform.forward * m_fForceMultiplier);
-            print("bump!");
         }
         else if (c.collider.CompareTag("Paw"))
         {
@@ -69,10 +69,14 @@ public class MouseController : MonoBehaviour {
         }
     }
 	
-	void FixedUpdate () {
+    void Update()
+    {
         // fetch movement from axis
-        float h = Input.GetAxis("Horizontal_" + m_iControllerNumber);
-        float v = Input.GetAxis("Vertical_" + m_iControllerNumber);
+        h = Input.GetAxisRaw("Horizontal_" + m_iControllerNumber);
+        v = Input.GetAxisRaw("Vertical_" + m_iControllerNumber);
+    }
+
+	void FixedUpdate () {
 
         bool walking = h != 0f || v != 0f;
         Move(h, v);
@@ -116,7 +120,7 @@ public class MouseController : MonoBehaviour {
         if (miceAlive > 0)
         {
             // turn of mesh renderers and colliders
-            GetComponent<MeshRenderer>().enabled = false;
+            //GetComponent<MeshRenderer>().enabled = false;
             transform.GetChild(0).gameObject.SetActive(false);
             transform.GetChild(1).gameObject.SetActive(false);
             GetComponent<Collider>().enabled = false;
@@ -124,7 +128,7 @@ public class MouseController : MonoBehaviour {
         else
         {
             // LAST MOUSE GOT KILLED, DO NOT TURN INTO A LAZOR
-            print("Last Mouse got killed");
+            //print("Last Mouse got killed");
         }
     }
 
@@ -133,7 +137,7 @@ public class MouseController : MonoBehaviour {
         m_iControllerNumber = number;
 
         Material mat = Resources.Load<Material>("Materials/mouse/colors/col" + number);
-        if (mat == null) print("couldnt load");
+        //if (mat == null) print("couldnt load");
         m_rendererMouseColor.material = mat;
         Material[] mats = m_rendererTurnKeyColor.materials;
         mats[1] = mat;
