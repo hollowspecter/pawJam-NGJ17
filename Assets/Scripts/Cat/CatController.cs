@@ -42,21 +42,23 @@ public class CatController :MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Vector3 newPos = Vector3.zero;
-        if(m_pressedKeys.Count > 0) {
-            foreach(GridCell cell in m_pressedKeys) {
+
+        if (m_pressedKeys.Count > 0) {
+            foreach (GridCell cell in m_pressedKeys) {
                 newPos += cell.transform.position;
             }
-            newPos /= m_pressedKeys.Count;
+            GridCell lastCell = (GridCell)m_pressedKeys[m_pressedKeys.Count - 1];
+            newPos = m_averageKeys ? newPos/m_pressedKeys.Count : lastCell.transform.position;
             newPos.y = m_pawHeight;
             m_pawDestination.position = newPos;
 
-        }
-        float distance = Vector3.Distance(m_pawDestination.position, m_paw.transform.position);
-        if(distance > (pawSpeed * Time.deltaTime)) {
-            m_paw.transform.position += (m_pawDestination.position - m_paw.transform.position).normalized * pawSpeed * Time.deltaTime;
-        }
-        else {
-            m_paw.transform.position = m_pawDestination.position;
+            float distance = Vector3.Distance(m_pawDestination.position, m_paw.transform.position);
+            if (distance > (pawSpeed * Time.deltaTime)) {
+                m_paw.transform.position += (m_pawDestination.position - m_paw.transform.position).normalized * pawSpeed * Time.deltaTime;
+            }
+            else {
+                m_paw.transform.position = m_pawDestination.position;
+            }
         }
 
         if (Input.GetKey(KeyCode.Space)) {
