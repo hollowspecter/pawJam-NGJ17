@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 public class MouseController : MonoBehaviour {
 
-    [Range(1,2)]
+    [Range(1,4)]
     [SerializeField]
     private int m_iControllerNumber = 1;
     [SerializeField]
