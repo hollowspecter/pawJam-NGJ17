@@ -30,13 +30,10 @@ public class GridCreator :MonoBehaviour {
         float cellDimensionX = levelSize.width / 9.0f;
         float cellDimensionY = levelSize.height / 4.0f;
 
-        Debug.Log(baseKeys.GetLength(0));
-        Debug.Log(baseKeys.GetLength(1));
-
         int count = 0;
         for(int i = 0; i < 4;++i) {
             for(int j = 0; j < 9; ++j) {
-                Debug.Log(i+"|"+j+ "   :"+baseKeys[i, j]);
+                //Debug.Log(i+"|"+j+ "   :"+baseKeys[i, j]);
 
                 Vector3 currentPos = new Vector3(offsets[i] + (0.5f * cellDimensionX) + (j * cellDimensionX) + levelSize.xMin, 0.0f, ((3-i) * cellDimensionY) + (0.5f * cellDimensionY)+ levelSize.yMin);
                 GameObject current = Instantiate(cell, currentPos, cell.transform.rotation);
