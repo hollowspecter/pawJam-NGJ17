@@ -150,6 +150,7 @@ public class GameManager : MonoBehaviour {
             animator.SetFloat(animID_Timer, gameTimer[0]);
             WaitingForPlayersInit = PlayersReadyInit = DefaultGameStateInit = 
                 PauseInit = MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
+            UIController.Instance.UpdateClock(2, 0.0f);
         }
 
         

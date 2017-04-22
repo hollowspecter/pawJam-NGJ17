@@ -48,7 +48,7 @@ public class UIController : MonoBehaviour {
 
         txt.color = on;
         float timer = 4.0f;
-        while(timer <= 0.0f) {
+        while(timer >= 0.0f) {
             if (timer <= 0.5f)
                 txt.color = Color.Lerp(on, off, timer / 0.5f);
             int tmp = (int)(timer * 10);
@@ -65,7 +65,7 @@ public class UIController : MonoBehaviour {
         Color on = new Color(txt.color.r, txt.color.g, txt.color.b, 0.0f);
         Color off = new Color(txt.color.r, txt.color.g, txt.color.b, 1.0f);
         float timer = 4.0f;
-        while (timer <= 0.0f) {
+        while (timer >= 0.0f) {
             if (timer <= 0.5f)
                 txt.color = Color.Lerp(on, off, timer / 0.5f);
             int tmp = (int)(timer * 10);
@@ -84,15 +84,25 @@ public class UIController : MonoBehaviour {
     public void UpdateClock(int type, float time) {
         string result = MakeTime(time);
 
-        if (type == 0) {
-            countdownTimer.text = "";
-            timer.text = result;
+        switch (type) {
+            case 0: {
+                    countdownTimer.enabled = false;
+                    timer.text = result;
+                    timer.enabled = true;
+                    break;
+                }
+            case 1: {
+                    timer.enabled = false;
+                    countdownTimer.text = result;
+                    countdownTimer.enabled = true;
+                    break;
+                }
+            case 2: {
+                    timer.enabled = false;
+                    countdownTimer.enabled = false;
+                    break;
+                }
         }
-        else if (type == 1) {
-            timer.text = "";
-            countdownTimer.text = result;
-        }
- 
     }
 
 
