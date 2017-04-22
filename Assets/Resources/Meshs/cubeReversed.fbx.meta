@@ -1,27 +1,15 @@
 fileFormatVersion: 2
-guid: e2d43f7fd6e699547af84525e74d4c5a
-timeCreated: 1492896571
+guid: 1fbc92ca3212e37489f98d9f8e631c97
+timeCreated: 1492900079
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: BottomContact
-    100002: Glass
-    100004: //RootNode
-    100006: ScrewThreads
-    400000: BottomContact
-    400002: Glass
-    400004: //RootNode
-    400006: ScrewThreads
-    2300000: BottomContact
-    2300002: Glass
-    2300004: ScrewThreads
-    3300000: BottomContact
-    3300002: Glass
-    3300004: ScrewThreads
-    4300000: BottomContact
-    4300002: Glass
-    4300004: ScrewThreads
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: pCube1
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -49,7 +37,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 10
+    globalScale: 100
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
@@ -66,7 +54,7 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 1
+    normalImportMode: 0
     tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
