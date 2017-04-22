@@ -42,9 +42,12 @@ public class MouseController : MonoBehaviour {
         laser.SetActive(false);
     }
 
-    void Update()
+    void OnCollisionEnter(Collision c)
     {
-        if (Input.GetKeyDown(KeyCode.K)) Kill();
+        if (c.collider.CompareTag("Paw"))
+        {
+            Kill();
+        }
     }
 	
 	void FixedUpdate () {
