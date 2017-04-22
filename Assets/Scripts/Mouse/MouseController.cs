@@ -115,10 +115,9 @@ public class MouseController : MonoBehaviour {
         miceAlive--;
         GameManager.Instance.MouseDied();
 
-        SpawnLaser();
-
         if (miceAlive > 0)
         {
+            SpawnLaser();
             // turn of mesh renderers and colliders
             //GetComponent<MeshRenderer>().enabled = false;
             transform.GetChild(0).gameObject.SetActive(false);
