@@ -39,7 +39,7 @@ public class PickUpSpawner : MonoBehaviour {
              
             // set a new timer for the next cooldown
             timer = Random.Range(m_minMaxSpawnCooldown.x, m_minMaxSpawnCooldown.y);
-            print("Spawn Pickup, next timer on " + timer);
+            //print("Spawn Pickup, next timer on " + timer);
         }
 	}
 }

@@ -65,7 +65,8 @@ public class MouseController : MonoBehaviour {
         }
         else if (c.collider.CompareTag("Paw"))
         {
-            Kill();
+            if (c.collider.GetComponent<CatController>().IsLethal)
+                Kill();
         }
     }
 	
