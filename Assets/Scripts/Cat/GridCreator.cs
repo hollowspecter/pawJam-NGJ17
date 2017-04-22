@@ -12,6 +12,11 @@ public class GridCreator :MonoBehaviour {
 
     public GameObject cell;
     private ArrayList m_cells;
+    public ArrayList CellList {
+        get {
+            return m_cells;
+        }
+    }
 
     static private string[,] baseKeys = new string[,] {
         { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
@@ -19,7 +24,6 @@ public class GridCreator :MonoBehaviour {
         { "a", "s", "d", "f", "g", "h", "j", "k", "l" },
         { "y", "x", "c", "v", "b", "n", "m", ",", "." }
     };
-
 
     // Use this for initialization
     void Start () {
