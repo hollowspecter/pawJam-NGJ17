@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -22,6 +23,8 @@ public class MouseController : MonoBehaviour {
     [SerializeField]
     private float laserHeight = 15f;
     
+    private MeshRenderer m_rendererMouseColor;
+    private MeshRenderer m_rendererTurnKeyColor;
     private Rigidbody m_rigid;
     private Transform m_transform;
     public bool Dead { get { return dead; } }
@@ -38,6 +41,11 @@ public class MouseController : MonoBehaviour {
         m_rigid = GetComponent<Rigidbody>();
         m_transform = GetComponent<Transform>();
         miceAlive++;
+
+        m_rendererMouseColor = transform.GetChild(0).FindChild("mouse").GetComponent<MeshRenderer>();
+        m_rendererTurnKeyColor = transform.GetChild(0).FindChild("turn_key").GetComponent<MeshRenderer>();
+        Assert.IsNotNull<MeshRenderer>(m_rendererMouseColor);
+        Assert.IsNotNull<MeshRenderer>(m_rendererTurnKeyColor);
     }
 
     void SpawnLaser()
@@ -123,5 +131,12 @@ public class MouseController : MonoBehaviour {
     public void SetPlayerNumber(int number)
     {
         m_iControllerNumber = number;
+
+        Material mat = Resources.Load<Material>("Materials/mouse/colors/col" + number);
+        if (mat == null) print("couldnt load");
+        m_rendererMouseColor.material = mat;
+        Material[] mats = m_rendererTurnKeyColor.materials;
+        mats[1] = mat;
+        m_rendererTurnKeyColor.materials = mats;
     }
 }
