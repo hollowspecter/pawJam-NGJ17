@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
     public int animID_MiceCount    =    Animator.StringToHash ( "MiceCount"   );
     public int animID_MiceAlive    =    Animator.StringToHash ( "MiceAlive"   );
     public int animID_StartGame    =    Animator.StringToHash ( "StartGame"   );
-    public int animID_TimesUp      =    Animator.StringToHash ( "TimesUp"     );
+    public int animID_Timer        =    Animator.StringToHash ( "Timer"       );
     public int animID_PauseScreen  =    Animator.StringToHash ( "PauseScreen" );
     public int animID_ScoreScreen  =    Animator.StringToHash ( "ScoreScreen" );
 
@@ -115,6 +115,7 @@ public class GameManager : MonoBehaviour {
         DefaultGameStateInit = true;
 
         timer = Mathf.Clamp(timer - Time.deltaTime, 0.0f, Mathf.Infinity);
+        animator.SetFloat(animID_Timer, timer);
         UIController.Instance.UpdateTimer(timer);
     }
 
