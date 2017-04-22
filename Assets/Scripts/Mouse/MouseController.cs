@@ -21,7 +21,7 @@ public class MouseController : MonoBehaviour {
     private GameObject m_prefabLaser;
     [SerializeField]
     private float laserHeight = 15f;
-
+    
     private Rigidbody m_rigid;
     private Transform m_transform;
     public bool Dead { get { return dead; } }
@@ -30,6 +30,8 @@ public class MouseController : MonoBehaviour {
 
     public static int MiceAlive { get { return miceAlive; } }
     private static int miceAlive = 0;
+
+    private Vector3 movement = Vector3.zero;
 
 	void Awake()
     {
@@ -47,7 +49,13 @@ public class MouseController : MonoBehaviour {
 
     void OnCollisionEnter(Collision c)
     {
-        if (c.collider.CompareTag("Paw"))
+        if (c.collider.CompareTag("Mouse"))
+        {
+            //bump!
+            c.rigidbody.AddForce(transform.forward * m_fForceMultiplier);
+            print("bump!");
+        }
+        else if (c.collider.CompareTag("Paw"))
         {
             Kill();
         }
@@ -69,7 +77,7 @@ public class MouseController : MonoBehaviour {
 
     void Move(float h, float v)
     {
-        Vector3 movement = new Vector3(h, 0f, v);
+        movement = new Vector3(h, 0f, v);
         movement.Set(h, 0f, v);
         movement = movement.normalized * m_fSpeed * Time.deltaTime;
 
