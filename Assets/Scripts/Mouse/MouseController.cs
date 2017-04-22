@@ -17,14 +17,34 @@ public class MouseController : MonoBehaviour {
     private bool m_bMoveByForce = false;
     [SerializeField]
     private float m_fForceMultiplier = 10f;
+    [SerializeField]
+    private GameObject m_prefabLaser;
+    [SerializeField]
+    private float laserHeight = 15f;
 
     private Rigidbody m_rigid;
     private Transform m_transform;
+    public bool Dead { get { return dead; } }
+    private bool dead = false;
+    private GameObject laser;
 
 	void Awake()
     {
         m_rigid = GetComponent<Rigidbody>();
         m_transform = GetComponent<Transform>();
+    }
+
+    void Start()
+    {
+        laser = Instantiate<GameObject>(m_prefabLaser);
+        laser.transform.position = new Vector3(m_transform.position.x, laserHeight, m_transform.position.z);
+        laser.GetComponentInChildren<LaserController>().SetMouseTransform(m_transform);
+        laser.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.K)) Kill();
     }
 	
 	void FixedUpdate () {
@@ -65,6 +85,13 @@ public class MouseController : MonoBehaviour {
 
     public void Kill()
     {
-        Destroy(gameObject);
+        dead = true;
+
+        laser.SetActive(true);
+
+        // turn of mesh renderers and colliders
+        GetComponent<MeshRenderer>().enabled = false;
+        transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
     }
 }
