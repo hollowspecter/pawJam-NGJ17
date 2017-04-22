@@ -28,10 +28,14 @@ public class MouseController : MonoBehaviour {
     private bool dead = false;
     private GameObject laser;
 
+    public static int MiceAlive { get { return miceAlive; } }
+    private static int miceAlive = 0;
+
 	void Awake()
     {
         m_rigid = GetComponent<Rigidbody>();
         m_transform = GetComponent<Transform>();
+        miceAlive++;
     }
 
     void SpawnLaser()
@@ -88,14 +92,23 @@ public class MouseController : MonoBehaviour {
     public void Kill()
     {
         dead = true;
+        miceAlive--;
 
         SpawnLaser();
 
-        // turn of mesh renderers and colliders
-        GetComponent<MeshRenderer>().enabled = false;
-        transform.GetChild(0).gameObject.SetActive(false);
-        transform.GetChild(1).gameObject.SetActive(false);
-        GetComponent<Collider>().enabled = false;
+        if (miceAlive > 0)
+        {
+            // turn of mesh renderers and colliders
+            GetComponent<MeshRenderer>().enabled = false;
+            transform.GetChild(0).gameObject.SetActive(false);
+            transform.GetChild(1).gameObject.SetActive(false);
+            GetComponent<Collider>().enabled = false;
+        }
+        else
+        {
+            // LAST MOUSE GOT KILLED, DO NOT TURN INTO A LAZOR
+            print("Last Mouse got killed");
+        }
     }
 
     public void SetPlayerNumber(int number)
