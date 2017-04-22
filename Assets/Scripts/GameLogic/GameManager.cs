@@ -1,26 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
     public static GameManager Instance { get; private set; }
-    private Animator m_anim;
-    private List<int> animID_parameterHashes;
+    public Animator animator;
     private List<int> animID_stateHashes;
+
+    public int animID_MiceCount    =    Animator.StringToHash ( "MiceCount"   );
+    public int animID_MiceAlive    =    Animator.StringToHash ( "MiceAlive"   );
+    public int animID_StartGame    =    Animator.StringToHash ( "StartGame"   );
+    public int animID_TimesUp      =    Animator.StringToHash ( "TimesUp"     );
+    public int animID_PauseScreen  =    Animator.StringToHash ( "PauseScreen" );
+    public int animID_ScoreScreen  =    Animator.StringToHash ( "ScoreScreen" );
+
+    public float timer;
+
+
 
     //Init Variables
     private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit;
     
 
     void Awake() {
-        GameManager.Instance = this;
-        animID_parameterHashes = new List<int>();
-        animID_parameterHashes.Add(   Animator.StringToHash("MiceCount")    );
-        animID_parameterHashes.Add(   Animator.StringToHash("MiceAlive")    );
-        animID_parameterHashes.Add(   Animator.StringToHash("StartGame")    );
-        animID_parameterHashes.Add(   Animator.StringToHash("TimesUp")      );
-        animID_parameterHashes.Add(   Animator.StringToHash("PauseScreen")  );
-        animID_parameterHashes.Add(   Animator.StringToHash("ScoreScreen")  );
+        if (GameManager.Instance == null)
+            GameManager.Instance = this;
+        else
+            Destroy(this);
 
         animID_stateHashes = new List<int>();
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.WaitingForPlayers") );
@@ -30,16 +37,27 @@ public class GameManager : MonoBehaviour {
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.MiceWin")           );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.CatWin")            );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.ScoreScreen")       );
-        m_anim = GetComponent<Animator>();
+        animator = this.GetComponent<Animator>();
+    }
+    
+    public void MouseDied() {
+        animator.SetInteger(animID_MiceAlive, animator.GetInteger(animID_MiceAlive) - 1);
     }
 
-	public void StartGame() {
-        
+    public void StartGame(int playerAmount) {
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        if (state.fullPathHash != animID_stateHashes[0])
+            return;
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); // simply loads the scene after this
+        animator.SetInteger(animID_MiceCount, playerAmount);
+        animator.SetInteger(animID_MiceAlive, playerAmount);
+        animator.SetTrigger(animID_StartGame);
     }
 
 
     void Update() {
-        AnimatorStateInfo state = m_anim.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         int index = animID_stateHashes.IndexOf(state.fullPathHash);
         switch (index) {
             case 0: {
@@ -51,18 +69,22 @@ public class GameManager : MonoBehaviour {
                     break;
                 }
             case 2: {
-                    Pause();
+                    DefaultGameState();
                     break;
                 }
             case 3: {
-                    MiceWin();
+                    Pause();
                     break;
                 }
             case 4: {
-                    CatWin();
+                    MiceWin();
                     break;
                 }
             case 5: {
+                    CatWin();
+                    break;
+                }
+            case 6: {
                     ScoreScreen();
                     break;
                 }
@@ -88,15 +110,16 @@ public class GameManager : MonoBehaviour {
 
     private void DefaultGameState() {
         if (!DefaultGameStateInit) {
-
+            
         }
         DefaultGameStateInit = true;
 
+        timer = Mathf.Clamp(timer - Time.deltaTime, 0.0f, Mathf.Infinity);
+        UIController.Instance.UpdateTimer(timer);
     }
 
     private void Pause() {
         if (!PauseInit) {
-
         }
         PauseInit = true;
 

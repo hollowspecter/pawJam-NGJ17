@@ -63,9 +63,7 @@ public class MiceManager : MonoBehaviour {
             if (currPlayer < 0) return;
             else
             {
-                // LOAD GAME HERE
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); // simply loads the scene after this
-                
+                GameManager.Instance.StartGame(getNumPlayers());
             }
         }
     }

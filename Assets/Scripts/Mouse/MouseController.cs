@@ -101,6 +101,7 @@ public class MouseController : MonoBehaviour {
     {
         dead = true;
         miceAlive--;
+        GameManager.Instance.MouseDied();
 
         SpawnLaser();
 
