@@ -93,7 +93,8 @@ public class MouseController : MonoBehaviour {
 
         // turn of mesh renderers and colliders
         GetComponent<MeshRenderer>().enabled = false;
-        transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
+        transform.GetChild(0).gameObject.SetActive(false);
+        transform.GetChild(1).gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
     }
 
