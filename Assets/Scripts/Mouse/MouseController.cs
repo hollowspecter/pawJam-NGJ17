@@ -127,7 +127,7 @@ public class MouseController : MonoBehaviour {
         else
         {
             // LAST MOUSE GOT KILLED, DO NOT TURN INTO A LAZOR
-            //print("Last Mouse got killed");
+            Destroy(gameObject);
         }
     }
 
