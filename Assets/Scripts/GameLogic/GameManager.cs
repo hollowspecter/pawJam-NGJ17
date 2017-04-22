@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour {
                     break;
                 }
             case 4: {
-                    MiceWin();
+                    MouseWin();
                     break;
                 }
             case 5: {
@@ -122,6 +122,7 @@ public class GameManager : MonoBehaviour {
     private void Pause() {
         if (!PauseInit) {
         }
+        
         PauseInit = true;
 
     }
@@ -134,10 +135,11 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    private void MiceWin() {
+    private void MouseWin(int playerNumber = -1) {
         if (!MiceWinInit) {
 
         }
+        UIController.Instance.MouseWin();
         MiceWinInit = true;
 
     }
@@ -146,6 +148,7 @@ public class GameManager : MonoBehaviour {
         if (!CatWinInit) {
 
         }
+        UIController.Instance.CatWin();
         CatWinInit = true;
 
     }

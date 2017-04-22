@@ -70,9 +70,4 @@ public class UIController : MonoBehaviour {
         result += milliSecs.ToString();
         timer.text = result;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

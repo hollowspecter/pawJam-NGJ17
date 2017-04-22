@@ -43,8 +43,6 @@ public class MiceManager : MonoBehaviour {
         {
             CheckPlayerInput(i);
         }
-
-        CheckToStartGame();
 	}
 
     void CheckPlayerInput(int joystickNumber)
@@ -55,16 +53,13 @@ public class MiceManager : MonoBehaviour {
         if (joining) AddPlayer(joystickNumber);
     }
 
-    void CheckToStartGame()
+    public void CheckToStartGame()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // enough players?
+        if (currPlayer < 0) return;
+        else
         {
-            // enough players?
-            if (currPlayer < 0) return;
-            else
-            {
-                GameManager.Instance.StartGame(getNumPlayers());
-            }
+            GameManager.Instance.StartGame(getNumPlayers());
         }
     }
 
