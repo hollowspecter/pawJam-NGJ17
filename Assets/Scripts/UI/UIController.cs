@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,12 @@ public class UIController : MonoBehaviour {
     private GameObject mouseWin;
 
     [SerializeField]
+    private GameObject pauseScreen;
+
+    [SerializeField]
     private Text timer;
+
+    public Text countdownTimer;
 
 	void Awake() {
         if (Instance == null)
@@ -28,16 +34,69 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void CatWin() {
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            GameManager.Instance.animator.SetTrigger(GameManager.Instance.animID_PauseScreen);
+        }
+    }
+
+    public IEnumerator CatWin() {
         catWin.SetActive(true);
+        Text txt = catWin.GetComponentInChildren<Text>();
+        Color on = new Color(txt.color.r, txt.color.g, txt.color.b, 0.0f);
+        Color off = new Color(txt.color.r, txt.color.g, txt.color.b, 1.0f);
+
+        txt.color = on;
+        float timer = 4.0f;
+        while(timer <= 0.0f) {
+            if (timer <= 0.5f)
+                txt.color = Color.Lerp(on, off, timer / 0.5f);
+            int tmp = (int)(timer * 10);
+            float txtTimer = (float)(timer / 10.0f);
+            txt.text = txtTimer.ToString();
+            yield return null;
+        }
+        catWin.SetActive(false);
     }
 
-    public void MouseWin(int playerNumber = -1) {
+    public IEnumerator MouseWin(int playerNumber = -1) {
         mouseWin.SetActive(true);
+        Text txt = catWin.GetComponentInChildren<Text>();
+        Color on = new Color(txt.color.r, txt.color.g, txt.color.b, 0.0f);
+        Color off = new Color(txt.color.r, txt.color.g, txt.color.b, 1.0f);
+        float timer = 4.0f;
+        while (timer <= 0.0f) {
+            if (timer <= 0.5f)
+                txt.color = Color.Lerp(on, off, timer / 0.5f);
+            int tmp = (int)(timer * 10);
+            float txtTimer = (float)(timer / 10.0f);
+            txt.text = txtTimer.ToString();
+            yield return null;
+        }
+        mouseWin.SetActive(false);
 
     }
 
-    public void UpdateTimer(float time) {
+    public void Pause() {
+
+    }
+
+    public void UpdateClock(int type, float time) {
+        string result = MakeTime(time);
+
+        if (type == 0) {
+            countdownTimer.text = "";
+            timer.text = result;
+        }
+        else if (type == 1) {
+            timer.text = "";
+            countdownTimer.text = result;
+        }
+ 
+    }
+
+
+    public string MakeTime(float time) {
         int seconds;
 
         seconds = (int)time;
@@ -61,13 +120,18 @@ public class UIController : MonoBehaviour {
 
         if (seconds < 10)
             result += "0";
-        result += seconds + ".";
+        result += seconds + ":";
 
 
         if (milliSecs < 10) {
             result += "0";
         }
         result += milliSecs.ToString();
-        timer.text = result;
+        return result;
+    }
+
+    public void ResetClocks() {
+        countdownTimer.text = "";
+        timer.text = "";
     }
 }

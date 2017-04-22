@@ -8,19 +8,27 @@ public class GameManager : MonoBehaviour {
     public Animator animator;
     private List<int> animID_stateHashes;
 
-    public int animID_MiceCount    =    Animator.StringToHash ( "MiceCount"   );
-    public int animID_MiceAlive    =    Animator.StringToHash ( "MiceAlive"   );
-    public int animID_StartGame    =    Animator.StringToHash ( "StartGame"   );
-    public int animID_Timer        =    Animator.StringToHash ( "Timer"       );
-    public int animID_PauseScreen  =    Animator.StringToHash ( "PauseScreen" );
-    public int animID_ScoreScreen  =    Animator.StringToHash ( "ScoreScreen" );
+    public int animID_MiceCount     =    Animator.StringToHash ( "MiceCount"     );
+    public int animID_MiceAlive     =    Animator.StringToHash ( "MiceAlive"     );
+    public int animID_Timer         =    Animator.StringToHash ( "Timer"         );
+    public int animID_GameCountDown =    Animator.StringToHash ( "GameCountdown" );
+    public int animID_StartGame     =    Animator.StringToHash ( "StartGame"     );
+    public int animID_PauseScreen   =    Animator.StringToHash ( "PauseScreen"   );
+    public int animID_ScoreScreen   =    Animator.StringToHash ( "ScoreScreen"   );
 
-    public float timer;
+    public float[] gameTimer;
+
+    private int m_playerCount;
+    private List<int> m_points;
+
+    [SerializeField]
+    private float[] m_countdown;
+
 
 
 
     //Init Variables
-    private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit;
+    public bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
     
 
     void Awake() {
@@ -29,6 +37,8 @@ public class GameManager : MonoBehaviour {
         else
             Destroy(this);
 
+        m_points = new List<int>();
+
         animID_stateHashes = new List<int>();
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.WaitingForPlayers") );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.PlayersReady")      );
@@ -36,23 +46,49 @@ public class GameManager : MonoBehaviour {
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.Pause")             );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.MiceWin")           );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.CatWin")            );
-        animID_stateHashes.Add(   Animator.StringToHash("Base Layer.ScoreScreen")       );
+        animID_stateHashes.Add(   Animator.StringToHash("Base Layer.LastMouseStanding") );
         animator = this.GetComponent<Animator>();
     }
     
     public void MouseDied() {
-        animator.SetInteger(animID_MiceAlive, animator.GetInteger(animID_MiceAlive) - 1);
+        int mouseAlive = animator.GetInteger(animID_MiceAlive);
+        Debug.Log(mouseAlive);
+        mouseAlive = mouseAlive > 0 ? mouseAlive-1 : 0;
+        Debug.Log(mouseAlive);
+        animator.SetInteger(animID_MiceAlive, mouseAlive);
     }
 
     public void StartGame(int playerAmount) {
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        if (state.fullPathHash != animID_stateHashes[0])
-            return;
+        //animatorstateinfo state = animator.getcurrentanimatorstateinfo(0);
+        //if (state.fullpathhash != animid_statehashes[0] || state.fullpathhash)
+        //    return;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); // simply loads the scene after this
+        
+        if(playerAmount != m_playerCount) {
+            m_playerCount = playerAmount;
+            for(int i = 0; i < m_playerCount; ++i) {
+                m_points.Add(0);
+            }
+        }
+
+        SceneManager.LoadScene(1); // simply loads the scene after this
         animator.SetInteger(animID_MiceCount, playerAmount);
         animator.SetInteger(animID_MiceAlive, playerAmount);
+        StartCoroutine(Starting());
+    }
+
+    public IEnumerator Starting() {
+        m_countdown[0] = m_countdown[1];
+        animator.SetFloat(animID_GameCountDown, m_countdown[0]);
         animator.SetTrigger(animID_StartGame);
+        UIController.Instance.countdownTimer.enabled = true;
+        while (m_countdown[0] >= 0.0f) {
+            yield return null;
+            m_countdown[0] = Mathf.Clamp(m_countdown[0] - Time.deltaTime, 0.0f, m_countdown[1]);
+            animator.SetFloat(animID_GameCountDown, m_countdown[0]);
+            UIController.Instance.UpdateClock(1, m_countdown[0]);
+        }
+        UIController.Instance.countdownTimer.enabled = false;
     }
 
 
@@ -85,71 +121,68 @@ public class GameManager : MonoBehaviour {
                     break;
                 }
             case 6: {
-                    ScoreScreen();
+                    LastMouseStanding();
                     break;
                 }
-            
+             
         }
     }
 
     private void WaitingForPlayers() {
         if (!WaitingForPlayersInit) {
-
+            WaitingForPlayersInit = true;
         }
-        WaitingForPlayersInit = true;
 
     }
 
     private void PlayersReady() {
         if (!PlayersReadyInit) {
-
+            PlayersReadyInit = true;
         }
-        PlayersReadyInit = true;
 
     }
 
     private void DefaultGameState() {
         if (!DefaultGameStateInit) {
-            
+            UIController.Instance.ResetClocks();
+            DefaultGameStateInit = true;
+            gameTimer[0] = gameTimer[1];
+            animator.SetFloat(animID_Timer, gameTimer[0]);
+            WaitingForPlayersInit = PlayersReadyInit = DefaultGameStateInit = 
+                PauseInit = MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
         }
-        DefaultGameStateInit = true;
 
-        timer = Mathf.Clamp(timer - Time.deltaTime, 0.0f, Mathf.Infinity);
-        animator.SetFloat(animID_Timer, timer);
-        UIController.Instance.UpdateTimer(timer);
+        
+    }
+
+    private void LastMouseStanding() {
+        if (!LastMouseStandingInit) {
+            LastMouseStandingInit = true;
+        }
+        gameTimer[0] = Mathf.Clamp(gameTimer[0] - Time.deltaTime, 0.0f, Mathf.Infinity);
+        animator.SetFloat(animID_Timer, gameTimer[0]);
+        UIController.Instance.UpdateClock(0, gameTimer[0]);
     }
 
     private void Pause() {
         if (!PauseInit) {
+            PauseInit = true;
         }
-        
-        PauseInit = true;
-
-    }
-
-    private void ScoreScreen() {
-        if (!ScoreScreenInit) {
-
-        }
-        ScoreScreenInit = true;
-
     }
 
     private void MouseWin(int playerNumber = -1) {
         if (!MiceWinInit) {
-
+            StartCoroutine(UIController.Instance.MouseWin());
+            StartGame(m_playerCount);
+            MiceWinInit = true;
         }
-        UIController.Instance.MouseWin();
-        MiceWinInit = true;
-
     }
 
     private void CatWin() {
         if (!CatWinInit) {
-
+            StartCoroutine(UIController.Instance.CatWin());
+            StartGame(m_playerCount);
+            CatWinInit = true;
         }
-        UIController.Instance.CatWin();
-        CatWinInit = true;
-
     }
 }
