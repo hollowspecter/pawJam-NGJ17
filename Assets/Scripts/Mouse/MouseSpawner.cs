@@ -25,6 +25,7 @@ public class MouseSpawner : MonoBehaviour {
 
         // fetch the player mapping array
         MiceManager m = MiceManager.s_instance;
+        if (m == null) return;
         int[] playerMapping = m.getPlayerMapping();
 
         for (int i=0; i<playerMapping.Length; ++i)

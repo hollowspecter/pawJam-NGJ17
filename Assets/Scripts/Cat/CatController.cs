@@ -28,6 +28,15 @@ public class CatController :MonoBehaviour {
     private float m_timeToHit;
     private float m_hitProgress;
 
+    public bool IsLethal { get { return !m_bPlayedPoof; } }
+    private bool m_bPlayedPoof = false;
+    private ParticleSystem m_particles;
+
+    void Awake()
+    {
+        m_particles = GetComponentInChildren<ParticleSystem>();
+    }
+
     // Use this for initialization
     void Start() {
         m_pressedKeys = new ArrayList();
@@ -42,7 +51,7 @@ public class CatController :MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Vector3 newPos = Vector3.zero;
-
+        
         if (m_pressedKeys.Count > 0) {
             foreach (GridCell cell in m_pressedKeys) {
                 newPos += cell.transform.position;
@@ -55,9 +64,11 @@ public class CatController :MonoBehaviour {
             float distance = Vector3.Distance(m_pawDestination.position, m_paw.transform.position);
             if (distance > (pawSpeed * Time.deltaTime)) {
                 m_paw.transform.position += (m_pawDestination.position - m_paw.transform.position).normalized * pawSpeed * Time.deltaTime;
+                
             }
             else {
                 m_paw.transform.position = m_pawDestination.position;
+                
             }
         }
 
@@ -66,11 +77,20 @@ public class CatController :MonoBehaviour {
         }
         else {
             m_hitProgress = Mathf.Clamp01(m_hitProgress - (Time.deltaTime / m_timeToHit));
+            
         }
 
         float height = m_pawHeight - (speedCurve.Evaluate(m_hitProgress) * m_pawHeight);
         m_paw.transform.position = new Vector3(m_paw.transform.position.x, height, m_paw.transform.position.z);
 
+        if (height < 0.01f && !m_bPlayedPoof)
+        {
+            m_bPlayedPoof = true;
+            m_particles.Play();
+        }else if (height > 2)
+        {
+            m_bPlayedPoof = false;
+        }
     }
 
     private void GridPressed(GridCell cell, bool triggered) {

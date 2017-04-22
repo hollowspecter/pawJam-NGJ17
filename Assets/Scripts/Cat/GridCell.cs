@@ -26,11 +26,13 @@ public class GridCell :MonoBehaviour {
     void Update() {
         if (!string.IsNullOrEmpty(triggerKey)) {
             if (Input.GetKeyDown(triggerKey)) {
-                m_meshR.material.color = lighted;
+                //m_meshR.material.color = lighted;
+                m_meshR.material.SetColor("_EmissionColor", lighted);
                 KeyEvent.Send(this, true);
             }
             if (Input.GetKeyUp(triggerKey)) {
-                m_meshR.material.color = basic;
+                //m_meshR.material.color = basic;
+                m_meshR.material.SetColor("_EmissionColor", basic);
                 KeyEvent.Send(this, false);
 
             }
