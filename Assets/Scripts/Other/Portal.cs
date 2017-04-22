@@ -20,6 +20,9 @@ public class Portal : MonoBehaviour {
         {
             // teleport it!
             c.transform.position = new Vector3(connectedTo.position.x, 0f, connectedTo.position.z);
+
+            // reset the tail
+            c.GetComponentInChildren<Tail>().Reset();
         }
     }
 }
