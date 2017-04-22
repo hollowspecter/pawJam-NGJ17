@@ -21,7 +21,9 @@ public class MouseController : MonoBehaviour {
     [SerializeField]
     private GameObject m_prefabLaser;
     [SerializeField]
-    private float laserHeight = 15f;
+    private Vector3 laserOrigin;
+    [SerializeField]
+    private float m_fLaserOffset = 0.5f;
     
     private MeshRenderer m_rendererMouseColor;
     private MeshRenderer m_rendererTurnKeyColor;
@@ -49,10 +51,10 @@ public class MouseController : MonoBehaviour {
         Assert.IsNotNull<MeshRenderer>(m_rendererTurnKeyColor);
     }
 
-    void SpawnLaser()
+    void ActivateLaser()
     {
         laser = Instantiate<GameObject>(m_prefabLaser);
-        laser.transform.position = new Vector3(m_transform.position.x, laserHeight, m_transform.position.z);
+        laser.transform.position = laserOrigin + Vector3.right * m_fLaserOffset;
         laser.GetComponentInChildren<LaserController>().SetMouseTransform(m_transform);
     }
 
@@ -65,7 +67,7 @@ public class MouseController : MonoBehaviour {
         }
         else if (c.collider.CompareTag("Paw"))
         {
-            if (c.collider.GetComponent<CatController>().IsLethal)
+            //if (c.collider.GetComponent<CatController>().IsLethal) //TODO fix this
                 Kill();
         }
     }
@@ -118,7 +120,7 @@ public class MouseController : MonoBehaviour {
 
         if (miceAlive > 0)
         {
-            SpawnLaser();
+            ActivateLaser();
             // turn of mesh renderers and colliders
             //GetComponent<MeshRenderer>().enabled = false;
             transform.GetChild(0).gameObject.SetActive(false);
