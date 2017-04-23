@@ -7,7 +7,7 @@ public class KillEvent {
     public static event MouseDiedEvent OnMouseDeath;
 
     public static void Send(GameObject go) {
-        if(null != go) {
+        if(null != go && OnMouseDeath != null) {
             OnMouseDeath(go);
         }
     }
