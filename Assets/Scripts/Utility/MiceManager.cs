@@ -74,7 +74,8 @@ public class MiceManager : MonoBehaviour {
         // react to it
         if (m_debugText != null)
         {
-            m_debugText.text += "\nPlayer " + joystickNumber + " joined the game!";
+            string s = m_debugText.text;
+            m_debugText.text = "Player " + joystickNumber + " joined the game!\n" + s;
         }
     }
 
