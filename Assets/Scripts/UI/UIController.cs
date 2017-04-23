@@ -56,7 +56,17 @@ public class UIController : MonoBehaviour {
     }
 
     private void writeScoreboard(GameObject go = null) {
-        
+        foreach(Text txt in scoreboard) {
+            txt.text = "";
+        }
+
+        for(int i = 0; i < 9; ++i) {
+            Text txt = scoreboard[i / 3];
+            if(GameManager.Instance.Points.ContainsKey(i)) {
+                txt.text += GameManager.Instance.Points[i];
+            }
+            txt.text += "\n";
+        }
     }
 
     public void switchDisplay(CONSTANTS.UI_STATES state) {
