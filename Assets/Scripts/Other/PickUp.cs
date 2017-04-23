@@ -19,7 +19,6 @@ public class PickUp : MonoBehaviour {
         float time = CONSTANTS.SCRAMBLED_KEYS_TIME;
         GridCreator.Instance.assignKeys(GridCreator.Instance.scrambledKeys);
         while(time > 0.0f) {
-            Debug.Log(time);
             yield return null;
             time -= Time.deltaTime;
         }

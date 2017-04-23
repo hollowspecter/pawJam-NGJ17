@@ -36,8 +36,8 @@ public class GameManager : MonoBehaviour {
         } }
 
     //Init Variables
-    private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
-    private bool m_cancel;
+    private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
+    private bool m_cancel = false;
 
     void Awake() {
         if (GameManager.Instance == null)
@@ -79,56 +79,35 @@ public class GameManager : MonoBehaviour {
 
     private void ResetForGame() {
         WaitingForPlayersInit = PlayersReadyInit = DefaultGameStateInit =
-                PauseInit = MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
+                MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
         countdown[0] = countdown[1];
         gameTimer[0] = gameTimer[1];
+        animator.SetInteger(animID_MiceCount, m_playerCount);
+        animator.SetInteger(animID_MiceAlive, m_playerCount);
     }
 
     public void StartGame(int[] playerMapping = null) {
-        //animatorstateinfo state = animator.getcurrentanimatorstateinfo(0);
-        //if (state.fullpathhash != animid_statehashes[0] || state.fullpathhash)
-        //    return;
-        ResetForGame();
-        int playerAmount;
         if(playerMapping != null) {
-            playerAmount = 0;
+            m_playerCount = 0;
             for(int i = 0; i < playerMapping.Length; ++i) {
                 if(playerMapping[i] != -1 && !m_points.ContainsKey(playerMapping[i])) {
-                    playerAmount++;
+                    m_playerCount++;
                     m_points.Add(playerMapping[i], 0);
                 }
             }
         }
         else {
-            playerAmount = m_points.Keys.Count;
+            m_playerCount = m_points.Keys.Count;
         }
 
         SceneManager.LoadScene(1); // simply loads the scene after this
-        animator.SetInteger(animID_MiceCount, playerAmount);
-        animator.SetInteger(animID_MiceAlive, playerAmount);
-        StartCoroutine(Starting());
-    }
-
-    public IEnumerator Starting() {
-        countdown[0] = countdown[1];
-        while (!UIController.Instance)
-            yield return null;
-        animator.SetFloat(animID_GameCountDown, countdown[0]);
+        Debug.Log(m_playerCount);
         animator.SetTrigger(animID_StartGame);
-        while (countdown[0] >= 0.0f) {
-            if (m_cancel) {
-                m_cancel = false;
-                yield break;
-            }
-            countdown[0] = Mathf.Clamp(countdown[0] - Time.deltaTime, 0.0f, countdown[1]);
-            animator.SetFloat(animID_GameCountDown, countdown[0]);
-            yield return null;
-        }
+        
     }
-
 
     void Update() {
-        Debug.Log(m_cancel);
+        Debug.Log(this.gameObject.GetInstanceID() +"  "+ m_playerCount);
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         int index = animID_stateHashes.IndexOf(state.fullPathHash);
         switch (index) {
@@ -175,11 +154,26 @@ public class GameManager : MonoBehaviour {
 
     private void PlayersReady() {
         if (!PlayersReadyInit) {
+            ResetForGame();
             PlayersReadyInit = true;
             UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.COUNTDOWN);
             CatController cat = GameObject.FindObjectOfType<CatController>();
             cat.HittingBlocked = true;
         }
+
+        if (!UIController.Instance)
+            return;
+        animator.SetFloat(animID_GameCountDown, countdown[0]);
+        if (countdown[0] >= 0.0f) {
+            if (m_cancel) {
+                m_cancel = false;
+            }
+            countdown[0] = Mathf.Clamp(countdown[0] - Time.deltaTime, 0.0f, countdown[1]);
+            animator.SetFloat(animID_GameCountDown, countdown[0]);
+        }
+
+        /*
+        Currently no going back, our game is awesome!
         if (Input.GetKeyDown(KeyCode.Escape)) {
             {
                 animator.SetTrigger(animID_Cancel);
@@ -187,6 +181,7 @@ public class GameManager : MonoBehaviour {
                 SceneManager.LoadScene(0);
             }
         }
+        */
 
     }
 
@@ -200,7 +195,6 @@ public class GameManager : MonoBehaviour {
             cat.HittingBlocked = false;
         }
 
-        
     }
 
     private void LastMouseStanding() {
@@ -213,16 +207,13 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Pause() {
-        if (!PauseInit) {
-            PauseInit = true;
-        }
     }
 
     private void MouseWin(int playerNumber = -1) {
         if (!MiceWinInit) {
             PlayersReadyInit = false;
-            m_miceScore++;
             StartGame();
+            m_miceScore++;
             MiceWinInit = true;
         }
     }
@@ -230,8 +221,8 @@ public class GameManager : MonoBehaviour {
     private void CatWin() {
         if (!CatWinInit) {
             PlayersReadyInit = false;
-            m_catScore++;
             StartGame();
+            m_catScore++;
             CatWinInit = true;
         }
     }
