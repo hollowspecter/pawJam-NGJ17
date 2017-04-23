@@ -35,17 +35,18 @@ public class GameManager : MonoBehaviour {
             return m_miceScore;
         } }
 
-
     //Init Variables
     private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
-    
+    private bool m_cancel;
 
     void Awake() {
         if (GameManager.Instance == null)
             GameManager.Instance = this;
-        else
-            Destroy(this);
+        else {
+            Destroy(this.gameObject);
+        }
 
+        KillEvent.OnMouseDeath += MouseDied;
         m_points = new Dictionary<int, int>();
 
         animID_stateHashes = new List<int>();
@@ -57,6 +58,10 @@ public class GameManager : MonoBehaviour {
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.CatWin")            );
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.LastMouseStanding") );
         animator = this.GetComponent<Animator>();
+    }
+
+    void OnDisable() {
+        KillEvent.OnMouseDeath -= MouseDied;
     }
     
     public void MouseDied(GameObject mouse) {
@@ -83,7 +88,7 @@ public class GameManager : MonoBehaviour {
         //animatorstateinfo state = animator.getcurrentanimatorstateinfo(0);
         //if (state.fullpathhash != animid_statehashes[0] || state.fullpathhash)
         //    return;
-
+        ResetForGame();
         int playerAmount;
         if(playerMapping != null) {
             playerAmount = 0;
@@ -108,18 +113,22 @@ public class GameManager : MonoBehaviour {
         countdown[0] = countdown[1];
         while (!UIController.Instance)
             yield return null;
-        UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.COUNTDOWN);
         animator.SetFloat(animID_GameCountDown, countdown[0]);
         animator.SetTrigger(animID_StartGame);
         while (countdown[0] >= 0.0f) {
-            yield return null;
+            if (m_cancel) {
+                m_cancel = false;
+                yield break;
+            }
             countdown[0] = Mathf.Clamp(countdown[0] - Time.deltaTime, 0.0f, countdown[1]);
             animator.SetFloat(animID_GameCountDown, countdown[0]);
+            yield return null;
         }
     }
 
 
     void Update() {
+        Debug.Log(m_cancel);
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         int index = animID_stateHashes.IndexOf(state.fullPathHash);
         switch (index) {
@@ -151,6 +160,7 @@ public class GameManager : MonoBehaviour {
                     LastMouseStanding();
                     break;
                 }
+
              
         }
     }
@@ -165,11 +175,17 @@ public class GameManager : MonoBehaviour {
 
     private void PlayersReady() {
         if (!PlayersReadyInit) {
-            ResetForGame();
             PlayersReadyInit = true;
+            UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.COUNTDOWN);
+            CatController cat = GameObject.FindObjectOfType<CatController>();
+            cat.HittingBlocked = true;
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            animator.SetTrigger(animID_Cancel);
+            {
+                animator.SetTrigger(animID_Cancel);
+                m_cancel = true;
+                SceneManager.LoadScene(0);
+            }
         }
 
     }
@@ -180,6 +196,8 @@ public class GameManager : MonoBehaviour {
             gameTimer[0] = gameTimer[1];
             animator.SetFloat(animID_Timer, gameTimer[0]);
             UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.DEFAULT);
+            CatController cat = GameObject.FindObjectOfType<CatController>();
+            cat.HittingBlocked = false;
         }
 
         
@@ -203,6 +221,7 @@ public class GameManager : MonoBehaviour {
     private void MouseWin(int playerNumber = -1) {
         if (!MiceWinInit) {
             PlayersReadyInit = false;
+            m_miceScore++;
             StartGame();
             MiceWinInit = true;
         }
@@ -211,6 +230,7 @@ public class GameManager : MonoBehaviour {
     private void CatWin() {
         if (!CatWinInit) {
             PlayersReadyInit = false;
+            m_catScore++;
             StartGame();
             CatWinInit = true;
         }

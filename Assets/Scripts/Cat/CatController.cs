@@ -35,11 +35,16 @@ public class CatController :MonoBehaviour {
     private bool m_bPlayedPoof = false;
     private ParticleSystem m_particles;
 
+    public bool HittingBlocked {
+        get;set;
+    }
+
     void Awake()
     {
         m_particles = GetComponentInChildren<ParticleSystem>();
 
         pawSpeed = m_minMaxPawSpeed.y;
+        HittingBlocked = false;
     }
 
     // Use this for initialization
@@ -77,7 +82,7 @@ public class CatController :MonoBehaviour {
             }
         }
 
-        if (Input.GetKey(KeyCode.Space)) {
+        if (Input.GetKey(KeyCode.Space) && !HittingBlocked) {
             m_hitProgress = Mathf.Clamp01(m_hitProgress + (Time.deltaTime / m_timeToHit));
             pawSpeed = m_minMaxPawSpeed.x;
         }
