@@ -9,97 +9,74 @@ public class UIController : MonoBehaviour {
     public static UIController Instance;
 
     [SerializeField]
-    private GameObject catWin;
+    private GameObject m_defaultScore;
 
     [SerializeField]
-    private GameObject mouseWin;
+    private GameObject m_getReady;
 
     [SerializeField]
-    private GameObject pauseScreen;
+    private GameObject m_lastMouseStanding;
 
     [SerializeField]
-    private Text timer;
+    private Text text_lastMouseStandingTimer;
 
-    public Text countdownTimer;
+    [SerializeField]
+    private Text text_countdownTimer;
 
+
+    
+    [SerializeField]
+    private Text m_catMiceScore;
+    [SerializeField]
+    private Text[] scoreboard;
+
+        
+    
 	void Awake() {
         if (Instance == null)
             Instance = this;
         else
             Destroy(this);
 
-        catWin.SetActive(false);
-        mouseWin.SetActive(false);
+        KillEvent.OnMouseDeath += writeScoreboard;
 
+    }
 
+    void OnDisable() {
+        KillEvent.OnMouseDeath -= writeScoreboard;
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            GameManager.Instance.animator.SetTrigger(GameManager.Instance.animID_PauseScreen);
-        }
+        text_lastMouseStandingTimer.text = MakeTime(GameManager.Instance.gameTimer[0]);
+        text_countdownTimer.text = MakeTime(GameManager.Instance.countdown[0]);
+
+        m_catMiceScore.text = GameManager.Instance.CatScore + " : " + GameManager.Instance.MiceScore;
+
+        writeScoreboard();
     }
 
-    public IEnumerator CatWin() {
-        catWin.SetActive(true);
-        Text txt = catWin.GetComponentInChildren<Text>();
-        Color on = new Color(txt.color.r, txt.color.g, txt.color.b, 0.0f);
-        Color off = new Color(txt.color.r, txt.color.g, txt.color.b, 1.0f);
-
-        txt.color = on;
-        float timer = 4.0f;
-        while(timer >= 0.0f) {
-            if (timer <= 0.5f)
-                txt.color = Color.Lerp(on, off, timer / 0.5f);
-            int tmp = (int)(timer * 10);
-            float txtTimer = (float)(timer / 10.0f);
-            txt.text = txtTimer.ToString();
-            yield return null;
-        }
-        catWin.SetActive(false);
+    private void writeScoreboard(GameObject go = null) {
+        
     }
 
-    public IEnumerator MouseWin(int playerNumber = -1) {
-        mouseWin.SetActive(true);
-        Text txt = catWin.GetComponentInChildren<Text>();
-        Color on = new Color(txt.color.r, txt.color.g, txt.color.b, 0.0f);
-        Color off = new Color(txt.color.r, txt.color.g, txt.color.b, 1.0f);
-        float timer = 4.0f;
-        while (timer >= 0.0f) {
-            if (timer <= 0.5f)
-                txt.color = Color.Lerp(on, off, timer / 0.5f);
-            int tmp = (int)(timer * 10);
-            float txtTimer = (float)(timer / 10.0f);
-            txt.text = txtTimer.ToString();
-            yield return null;
-        }
-        mouseWin.SetActive(false);
-
-    }
-
-    public void Pause() {
-
-    }
-
-    public void UpdateClock(int type, float time) {
-        string result = MakeTime(time);
-
-        switch (type) {
-            case 0: {
-                    countdownTimer.enabled = false;
-                    timer.text = result;
-                    timer.enabled = true;
+    public void switchDisplay(CONSTANTS.UI_STATES state) {
+        switch (state) {
+            case CONSTANTS.UI_STATES.DEFAULT: {
+                    m_defaultScore.SetActive(true);
+                    m_getReady.SetActive(false);
+                    m_lastMouseStanding.SetActive(false);
                     break;
                 }
-            case 1: {
-                    timer.enabled = false;
-                    countdownTimer.text = result;
-                    countdownTimer.enabled = true;
+            case CONSTANTS.UI_STATES.LAST_MOUSE_STANDING: {
+                    m_defaultScore.SetActive(false);
+                    m_getReady.SetActive(false);
+                    m_lastMouseStanding.SetActive(true);
                     break;
                 }
-            case 2: {
-                    timer.enabled = false;
-                    countdownTimer.enabled = false;
+            case CONSTANTS.UI_STATES.COUNTDOWN: {
+                    m_defaultScore.SetActive(false);
+                    m_getReady.SetActive(true);
+                    m_lastMouseStanding.SetActive(false);
                     break;
                 }
         }
@@ -137,11 +114,6 @@ public class UIController : MonoBehaviour {
             result += "0";
         }
         result += milliSecs.ToString();
-        return result;
-    }
-
-    public void ResetClocks() {
-        countdownTimer.text = "";
-        timer.text = "";
+        return result.Trim();
     }
 }

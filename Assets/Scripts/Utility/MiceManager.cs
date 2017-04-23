@@ -59,7 +59,7 @@ public class MiceManager : MonoBehaviour {
         if (currPlayer < 0) return;
         else
         {
-            GameManager.Instance.StartGame(getNumPlayers());
+            GameManager.Instance.StartGame(getPlayerMapping());
         }
     }
 

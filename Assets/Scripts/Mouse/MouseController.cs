@@ -34,6 +34,8 @@ public class MouseController : MonoBehaviour {
     private GameObject laser;
     private float h = 0f, v = 0f;
 
+    public int ControllerNumber { get { return m_iControllerNumber; } }
+
     public static int MiceAlive { get { return miceAlive; } }
     private static int miceAlive = 0;
 
@@ -116,7 +118,7 @@ public class MouseController : MonoBehaviour {
     {
         dead = true;
         miceAlive--;
-        GameManager.Instance.MouseDied();
+        KillEvent.Send(gameObject);
 
         if (miceAlive > 0)
         {

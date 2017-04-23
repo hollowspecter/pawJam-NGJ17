@@ -14,21 +14,30 @@ public class GameManager : MonoBehaviour {
     public int animID_GameCountDown =    Animator.StringToHash ( "GameCountdown" );
     public int animID_StartGame     =    Animator.StringToHash ( "StartGame"     );
     public int animID_PauseScreen   =    Animator.StringToHash ( "PauseScreen"   );
-    public int animID_ScoreScreen   =    Animator.StringToHash ( "ScoreScreen"   );
+    public int animID_Cancel        =    Animator.StringToHash ( "Cancel"        );
 
     public float[] gameTimer;
+    public float[] countdown;
 
     private int m_playerCount;
-    private List<int> m_points;
+    private Dictionary<int, int> m_points;
+    public Dictionary<int, int> Points { get {
+            return m_points;
+        } }
 
-    [SerializeField]
-    private float[] m_countdown;
+    private int m_catScore;
+    public int CatScore { get {
+            return m_catScore;
+        } }
 
-
+    private int m_miceScore;
+    public int MiceScore { get {
+            return m_miceScore;
+        } }
 
 
     //Init Variables
-    public bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
+    private bool WaitingForPlayersInit, PlayersReadyInit, DefaultGameStateInit, PauseInit, MiceWinInit, CatWinInit, ScoreScreenInit, LastMouseStandingInit;
     
 
     void Awake() {
@@ -37,7 +46,7 @@ public class GameManager : MonoBehaviour {
         else
             Destroy(this);
 
-        m_points = new List<int>();
+        m_points = new Dictionary<int, int>();
 
         animID_stateHashes = new List<int>();
         animID_stateHashes.Add(   Animator.StringToHash("Base Layer.WaitingForPlayers") );
@@ -50,25 +59,43 @@ public class GameManager : MonoBehaviour {
         animator = this.GetComponent<Animator>();
     }
     
-    public void MouseDied() {
+    public void MouseDied(GameObject mouse) {
         int mouseAlive = animator.GetInteger(animID_MiceAlive);
-        Debug.Log(mouseAlive);
         mouseAlive = mouseAlive > 0 ? mouseAlive-1 : 0;
-        Debug.Log(mouseAlive);
         animator.SetInteger(animID_MiceAlive, mouseAlive);
+        MouseController msc = mouse.GetComponent<MouseController>();
+        int controllerNum = msc.ControllerNumber;
+
+        foreach(int i in m_points.Keys) {
+            if (i != controllerNum)
+                m_points[i]++;
+        }
     }
 
-    public void StartGame(int playerAmount) {
+    private void ResetForGame() {
+        WaitingForPlayersInit = PlayersReadyInit = DefaultGameStateInit =
+                PauseInit = MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
+        countdown[0] = countdown[1];
+        gameTimer[0] = gameTimer[1];
+    }
+
+    public void StartGame(int[] playerMapping = null) {
         //animatorstateinfo state = animator.getcurrentanimatorstateinfo(0);
         //if (state.fullpathhash != animid_statehashes[0] || state.fullpathhash)
         //    return;
 
-        
-        if(playerAmount != m_playerCount) {
-            m_playerCount = playerAmount;
-            for(int i = 0; i < m_playerCount; ++i) {
-                m_points.Add(0);
+        int playerAmount;
+        if(playerMapping != null) {
+            playerAmount = 0;
+            for(int i = 0; i < playerMapping.Length; ++i) {
+                if(playerMapping[i] != -1 && !m_points.ContainsKey(playerMapping[i])) {
+                    playerAmount++;
+                    m_points.Add(playerMapping[i], 0);
+                }
             }
+        }
+        else {
+            playerAmount = m_points.Keys.Count;
         }
 
         SceneManager.LoadScene(1); // simply loads the scene after this
@@ -78,17 +105,17 @@ public class GameManager : MonoBehaviour {
     }
 
     public IEnumerator Starting() {
-        m_countdown[0] = m_countdown[1];
-        animator.SetFloat(animID_GameCountDown, m_countdown[0]);
-        animator.SetTrigger(animID_StartGame);
-        UIController.Instance.countdownTimer.enabled = true;
-        while (m_countdown[0] >= 0.0f) {
+        countdown[0] = countdown[1];
+        while (!UIController.Instance)
             yield return null;
-            m_countdown[0] = Mathf.Clamp(m_countdown[0] - Time.deltaTime, 0.0f, m_countdown[1]);
-            animator.SetFloat(animID_GameCountDown, m_countdown[0]);
-            UIController.Instance.UpdateClock(1, m_countdown[0]);
+        UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.COUNTDOWN);
+        animator.SetFloat(animID_GameCountDown, countdown[0]);
+        animator.SetTrigger(animID_StartGame);
+        while (countdown[0] >= 0.0f) {
+            yield return null;
+            countdown[0] = Mathf.Clamp(countdown[0] - Time.deltaTime, 0.0f, countdown[1]);
+            animator.SetFloat(animID_GameCountDown, countdown[0]);
         }
-        UIController.Instance.countdownTimer.enabled = false;
     }
 
 
@@ -130,27 +157,29 @@ public class GameManager : MonoBehaviour {
 
     private void WaitingForPlayers() {
         if (!WaitingForPlayersInit) {
+            m_miceScore = m_catScore = 0;
+            m_points.Clear();
             WaitingForPlayersInit = true;
         }
-
     }
 
     private void PlayersReady() {
         if (!PlayersReadyInit) {
+            ResetForGame();
             PlayersReadyInit = true;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            animator.SetTrigger(animID_Cancel);
         }
 
     }
 
     private void DefaultGameState() {
         if (!DefaultGameStateInit) {
-            UIController.Instance.ResetClocks();
             DefaultGameStateInit = true;
             gameTimer[0] = gameTimer[1];
             animator.SetFloat(animID_Timer, gameTimer[0]);
-            WaitingForPlayersInit = PlayersReadyInit = DefaultGameStateInit = 
-                PauseInit = MiceWinInit = CatWinInit = ScoreScreenInit = LastMouseStandingInit = false;
-            UIController.Instance.UpdateClock(2, 0.0f);
+            UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.DEFAULT);
         }
 
         
@@ -158,11 +187,11 @@ public class GameManager : MonoBehaviour {
 
     private void LastMouseStanding() {
         if (!LastMouseStandingInit) {
+            UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.LAST_MOUSE_STANDING);
             LastMouseStandingInit = true;
         }
         gameTimer[0] = Mathf.Clamp(gameTimer[0] - Time.deltaTime, 0.0f, Mathf.Infinity);
         animator.SetFloat(animID_Timer, gameTimer[0]);
-        UIController.Instance.UpdateClock(0, gameTimer[0]);
     }
 
     private void Pause() {
@@ -173,16 +202,16 @@ public class GameManager : MonoBehaviour {
 
     private void MouseWin(int playerNumber = -1) {
         if (!MiceWinInit) {
-            StartCoroutine(UIController.Instance.MouseWin());
-            StartGame(m_playerCount);
+            PlayersReadyInit = false;
+            StartGame();
             MiceWinInit = true;
         }
     }
 
     private void CatWin() {
         if (!CatWinInit) {
-            StartCoroutine(UIController.Instance.CatWin());
-            StartGame(m_playerCount);
+            PlayersReadyInit = false;
+            StartGame();
             CatWinInit = true;
         }
     }
