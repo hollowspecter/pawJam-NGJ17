@@ -71,10 +71,13 @@ public class GameManager : MonoBehaviour {
         MouseController msc = mouse.GetComponent<MouseController>();
         int controllerNum = msc.ControllerNumber;
 
+        var changes = new List<int>();
         foreach(int i in m_points.Keys) {
             if (i != controllerNum)
-                m_points[i]++;
+                changes.Add(i);
+                //m_points[i]++;
         }
+        foreach (int c in changes) m_points[c]++;
     }
 
     private void ResetForGame() {
