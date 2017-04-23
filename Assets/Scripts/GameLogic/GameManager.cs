@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour {
             animator.SetFloat(animID_Timer, gameTimer[0]);
             UIController.Instance.switchDisplay(CONSTANTS.UI_STATES.DEFAULT);
             CatController cat = GameObject.FindObjectOfType<CatController>();
-            cat.HittingBlocked = false
+            cat.HittingBlocked = false;
         }
 
         
