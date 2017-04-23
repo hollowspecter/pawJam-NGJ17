@@ -14,12 +14,19 @@ public class GridCell :MonoBehaviour {
     private Vector2 minMaxEmission = new Vector2(0.2f, 1f);
     [SerializeField]
     private AnimationCurve curve;
+    [SerializeField]
+    private float colorSpeed = 0.2f;
+    [SerializeField]
+    private float colorTurnBackSpeed = 10f;
+    [SerializeField]
+    private float afterglowDuration = 3f;
 
     private MeshRenderer m_meshR;
     public string triggerKey { get; set; }
     public GameObject paw;
     float pawHeight;
     private float emissionFactor;
+    private Color lastLightedColor;
 
     // Use this for initialization
     void Start() {
@@ -28,23 +35,41 @@ public class GridCell :MonoBehaviour {
         paw = GameObject.FindGameObjectWithTag("Paw");
         pawHeight = paw.transform.position.y;
         emissionFactor = minMaxEmission.x;
+        lastLightedColor = basic;
     }
 
     // Update is called once per frame
     void Update() {
+        CalculateLightedHue();
         CalculateCurrentEmissionFactor();
         HandleKeyInput();
     }
 
-    //private float timer = 0f;
+    void CalculateLightedHue()
+    {
+        float h, s, v;
+        Color.RGBToHSV(lighted, out h, out s, out v);
+        h += colorSpeed * Time.deltaTime;
+        h = h % 360;
+        lighted = Color.HSVToRGB(h, s, v);
+    }
+
+    private float lerpTimer = 0f;
     void CalculateCurrentEmissionFactor()
     {
+        lerpTimer += Time.deltaTime;
+        if (lerpTimer > afterglowDuration) lerpTimer = afterglowDuration;
+
         //timer += Time.deltaTime;
         emissionFactor = Mathf.PingPong(Time.time * bpm_forGlow / 60f, 1f);
         emissionFactor = curve.Evaluate(emissionFactor);
         emissionFactor = Mathf.Lerp(minMaxEmission.x, minMaxEmission.y, emissionFactor);
-        //emissionFactor = Mathf.PingPong(Time.time * bpm_forGlow/60f, minMaxEmission.y - minMaxEmission.x) + minMaxEmission.x;
-        m_meshR.material.SetColor("_EmissionColor", basic * emissionFactor);
+
+        // lerp color to the basic color
+        lastLightedColor = Color.Lerp(lastLightedColor, basic, lerpTimer / afterglowDuration);
+
+        // set the color
+        m_meshR.material.SetColor("_EmissionColor", lastLightedColor * emissionFactor);
         RendererExtensions.UpdateGIMaterials(m_meshR);
     }
 
@@ -54,7 +79,9 @@ public class GridCell :MonoBehaviour {
         {
             if (Input.GetKeyDown(triggerKey))
             {
+                lastLightedColor = lighted;
                 KeyEvent.Send(this, true);
+                lerpTimer = 0f;
             }
             else if (Input.GetKeyUp(triggerKey))
             {
@@ -63,7 +90,7 @@ public class GridCell :MonoBehaviour {
             // manage lighting
             if (Input.GetKey(triggerKey))
             {
-                m_meshR.material.SetColor("_EmissionColor", lighted * emissionFactor);
+                m_meshR.material.SetColor("_EmissionColor", lastLightedColor * emissionFactor);
                 RendererExtensions.UpdateGIMaterials(m_meshR);
             }
         }
