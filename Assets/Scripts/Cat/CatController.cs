@@ -99,7 +99,9 @@ public class CatController :MonoBehaviour {
             m_bPlayedPoof = true;
             m_particles.Play();
             SingleMusic.Instance.PlayEmptyPaw();
-        }else if (height > 2)
+            //SingleMusic.Instance.PlayMouseSquish();
+        }
+        else if (height > 2)
         {
             m_bPlayedPoof = false;
         }

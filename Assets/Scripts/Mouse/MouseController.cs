@@ -67,11 +67,14 @@ public class MouseController : MonoBehaviour {
         {
             //bump!
             c.rigidbody.AddForce(transform.forward * m_fForceMultiplier);
+            SingleMusic.Instance.PlayMouseCollide();
         }
         else if (c.collider.CompareTag("Paw"))
         {
             //if (c.collider.GetComponent<CatController>().IsLethal) //TODO fix this
                 Kill();
+            SingleMusic.Instance.PlayMouseSquish();
+
         }
     }
 	
