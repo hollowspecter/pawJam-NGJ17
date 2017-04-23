@@ -100,6 +100,7 @@ public class CatController :MonoBehaviour {
             m_particles.Play();
             SingleMusic.Instance.PlayEmptyPaw();
             //SingleMusic.Instance.PlayMouseSquish();
+            //SingleMusic.Instance.PlayPickup();
         }
         else if (height > 2)
         {
