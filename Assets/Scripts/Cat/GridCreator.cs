@@ -75,7 +75,6 @@ public class GridCreator :MonoBehaviour {
             //print(m_cells.Count);
         }
         assignKeys(baseKeys);
-
 	}
 
     public void assignKeys(string[,] keyMap) {
@@ -86,7 +85,7 @@ public class GridCreator :MonoBehaviour {
             for(int j = 0; j < 9; ++j) {
                 g = (GameObject) m_cells[count++];
                 cell = g.GetComponent<GridCell>();
-                cell.triggerKey = keyMap[i, j];
+                cell.setTriggerKey(keyMap[i, j]);
             }
         }
     }

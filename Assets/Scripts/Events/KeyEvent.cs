@@ -7,7 +7,7 @@ public class KeyEvent {
     public static event CellPressedEvent OnCellPressed;
 
     public static void Send(GridCell cell, bool triggered) {
-        if (null != cell) {
+        if (null != cell && OnCellPressed != null) {
             OnCellPressed(cell, triggered);
         }
     }

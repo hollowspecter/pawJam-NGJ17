@@ -22,11 +22,16 @@ public class GridCell :MonoBehaviour {
     private float afterglowDuration = 3f;
 
     private MeshRenderer m_meshR;
-    public string triggerKey { get; set; }
+    public string triggerKey { get; private set; }
     public GameObject paw;
     float pawHeight;
     private float emissionFactor;
     private Color lastLightedColor;
+
+    public void setTriggerKey(string s) {
+        KeyEvent.Send(this, false);
+        triggerKey = s;
+    }
 
     // Use this for initialization
     void Start() {

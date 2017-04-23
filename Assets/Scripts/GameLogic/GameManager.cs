@@ -110,7 +110,6 @@ public class GameManager : MonoBehaviour {
     }
 
     void Update() {
-        Debug.Log(this.gameObject.GetInstanceID() +"  "+ m_playerCount);
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         int index = animID_stateHashes.IndexOf(state.fullPathHash);
         switch (index) {
