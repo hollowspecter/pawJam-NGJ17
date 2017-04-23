@@ -28,14 +28,20 @@ public class GridCell :MonoBehaviour {
             if (Input.GetKeyDown(triggerKey)) {
                 //m_meshR.material.color = lighted;
                 m_meshR.material.SetColor("_EmissionColor", lighted);
+                RendererExtensions.UpdateGIMaterials(m_meshR);
+                //DynamicGI.SetEmissive(m_meshR, lighted);
                 KeyEvent.Send(this, true);
             }
             if (Input.GetKeyUp(triggerKey)) {
                 //m_meshR.material.color = basic;
                 m_meshR.material.SetColor("_EmissionColor", basic);
+                RendererExtensions.UpdateGIMaterials(m_meshR);
+                //DynamicGI.SetEmissive(m_meshR, basic);
                 KeyEvent.Send(this, false);
 
             }
         }
+
+        //DynamicGI.UpdateEnvironment();
     }
 }

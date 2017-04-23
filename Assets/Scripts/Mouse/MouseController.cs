@@ -56,7 +56,8 @@ public class MouseController : MonoBehaviour {
     void ActivateLaser()
     {
         laser = Instantiate<GameObject>(m_prefabLaser);
-        laser.transform.position = laserOrigin + Vector3.right * m_fLaserOffset;
+        laser.transform.position = laserOrigin;// + Vector3.right * (m_fLaserOffset * m_iControllerNumber);
+        laser.transform.Translate(Vector3.right * m_iControllerNumber * m_fLaserOffset);
         laser.GetComponentInChildren<LaserController>().SetMouseTransform(m_transform);
     }
 

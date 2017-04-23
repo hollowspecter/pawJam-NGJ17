@@ -35,4 +35,11 @@ public class Tail : MonoBehaviour {
             m_line.SetPositions(m_points.ToArray());
         }
 	}
+
+    public void Reset()
+    {
+        m_lastPoint = Vector3.zero;
+        m_points.Clear();
+        m_line.positionCount = 0;
+    }
 }

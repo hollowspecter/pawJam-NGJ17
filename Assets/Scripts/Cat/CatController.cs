@@ -15,7 +15,7 @@ public class CatController :MonoBehaviour {
 
     private float m_pawHeight;
 
-    [SerializeField]
+    //[SerializeField]
     private float pawSpeed;
 
     [SerializeField]
@@ -28,6 +28,9 @@ public class CatController :MonoBehaviour {
     private float m_timeToHit;
     private float m_hitProgress;
 
+    [SerializeField]
+    private Vector2 m_minMaxPawSpeed = new Vector2(10, 20);
+
     public bool IsLethal { get { return !m_bPlayedPoof; } }
     private bool m_bPlayedPoof = false;
     private ParticleSystem m_particles;
@@ -35,6 +38,8 @@ public class CatController :MonoBehaviour {
     void Awake()
     {
         m_particles = GetComponentInChildren<ParticleSystem>();
+
+        pawSpeed = m_minMaxPawSpeed.y;
     }
 
     // Use this for initialization
@@ -74,10 +79,11 @@ public class CatController :MonoBehaviour {
 
         if (Input.GetKey(KeyCode.Space)) {
             m_hitProgress = Mathf.Clamp01(m_hitProgress + (Time.deltaTime / m_timeToHit));
+            pawSpeed = m_minMaxPawSpeed.x;
         }
         else {
             m_hitProgress = Mathf.Clamp01(m_hitProgress - (Time.deltaTime / m_timeToHit));
-            
+            pawSpeed = m_minMaxPawSpeed.y;
         }
 
         float height = m_pawHeight - (speedCurve.Evaluate(m_hitProgress) * m_pawHeight);

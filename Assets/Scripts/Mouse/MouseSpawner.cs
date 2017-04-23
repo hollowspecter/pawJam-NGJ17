@@ -18,7 +18,7 @@ public class MouseSpawner : MonoBehaviour {
         // Fetch the SpawnPoints
         Transform[] spawns = GetComponentsInChildren<Transform>();
         var spawnsList = new List<Transform>();
-        for (int i = 0; i < spawns.Length; ++i)
+        for (int i = 1; i < spawns.Length; ++i) // throw away the
         {
             spawnsList.Add(spawns[i]);
         }
