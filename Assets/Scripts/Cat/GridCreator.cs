@@ -72,7 +72,7 @@ public class GridCreator :MonoBehaviour {
             {
                 m_cells.Add(cells[i].gameObject);
             }
-            print(m_cells.Count);
+            //print(m_cells.Count);
         }
         assignKeys(baseKeys);
 
