@@ -11,7 +11,7 @@ public class PickUpSpawner : MonoBehaviour {
     [SerializeField]
     private GameObject m_prefabPickUp;
 
-    private float timer = 0f;
+    private float timer = 20f;
     private GridCreator gridder;
     private int lastGridIndex;
 

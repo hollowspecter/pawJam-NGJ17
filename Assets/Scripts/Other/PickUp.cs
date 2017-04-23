@@ -11,6 +11,7 @@ public class PickUp : MonoBehaviour {
             StartCoroutine(Activate());
             Destroy(GetComponent<Collider>());
             Destroy(GetComponentInChildren<MeshRenderer>());
+            SingleMusic.Instance.PlayPickup();
         }
     }
 

@@ -27,6 +27,13 @@ public class SingleMusic : MonoBehaviour {
     [SerializeField]
     private Vector2 vol_squishMouse;
 
+    [SerializeField]
+    private AudioClip sfx_pickup;
+    [SerializeField]
+    private Vector2 pitch_pickup;
+    [SerializeField]
+    private Vector2 vol_pickup;
+
     private AudioSource m_audiosrcSFX;
 
 	// Use this for initialization
@@ -41,6 +48,7 @@ public class SingleMusic : MonoBehaviour {
     public void PlayEmptyPaw() { PlaySFXatRandomPitchVolume(sfx_emptyPaw, pitch_emptyPaw, vol_emptyPaw); }
     public void PlayMouseCollide() { PlaySFXatRandomPitchVolume(sfx_mouseCollide, pitch_mouseCollide, vol_mouseCollide); }
     public void PlayMouseSquish() { PlaySFXatRandomPitchVolume(sfx_squishMouse, pitch_squishMouse, vol_squishMouse, 3f); }
+    public void PlayPickup() { PlaySFXatRandomPitchVolume(sfx_pickup, pitch_pickup, vol_pickup); }
 
     void PlaySFXatRandomPitchVolume(AudioClip clip, Vector2 minMaxPitch, Vector2 minMaxVolume)
     {
