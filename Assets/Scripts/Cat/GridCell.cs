@@ -8,11 +8,25 @@ public class GridCell :MonoBehaviour {
     private Color lighted;
     [SerializeField]
     private Color basic;
-    private MeshRenderer m_meshR;
+    [SerializeField]
+    private int bpm_forGlow = 117;
+    [SerializeField]
+    private Vector2 minMaxEmission = new Vector2(0.2f, 1f);
+    [SerializeField]
+    private AnimationCurve curve;
+    [SerializeField]
+    private float colorSpeed = 0.2f;
+    [SerializeField]
+    private float colorTurnBackSpeed = 10f;
+    [SerializeField]
+    private float afterglowDuration = 3f;
 
+    private MeshRenderer m_meshR;
     public string triggerKey { get; set; }
     public GameObject paw;
     float pawHeight;
+    private float emissionFactor;
+    private Color lastLightedColor;
 
     // Use this for initialization
     void Start() {
@@ -20,28 +34,65 @@ public class GridCell :MonoBehaviour {
         m_meshR.material.color = basic;
         paw = GameObject.FindGameObjectWithTag("Paw");
         pawHeight = paw.transform.position.y;
+        emissionFactor = minMaxEmission.x;
+        lastLightedColor = basic;
     }
 
     // Update is called once per frame
     void Update() {
-        if (!string.IsNullOrEmpty(triggerKey)) {
-            if (Input.GetKeyDown(triggerKey)) {
-                //m_meshR.material.color = lighted;
-                m_meshR.material.SetColor("_EmissionColor", lighted);
-                RendererExtensions.UpdateGIMaterials(m_meshR);
-                //DynamicGI.SetEmissive(m_meshR, lighted);
-                KeyEvent.Send(this, true);
-            }
-            if (Input.GetKeyUp(triggerKey)) {
-                //m_meshR.material.color = basic;
-                m_meshR.material.SetColor("_EmissionColor", basic);
-                RendererExtensions.UpdateGIMaterials(m_meshR);
-                //DynamicGI.SetEmissive(m_meshR, basic);
-                KeyEvent.Send(this, false);
+        CalculateLightedHue();
+        CalculateCurrentEmissionFactor();
+        HandleKeyInput();
+    }
 
+    void CalculateLightedHue()
+    {
+        float h, s, v;
+        Color.RGBToHSV(lighted, out h, out s, out v);
+        h += colorSpeed * Time.deltaTime;
+        h = h % 360;
+        lighted = Color.HSVToRGB(h, s, v);
+    }
+
+    private float lerpTimer = 0f;
+    void CalculateCurrentEmissionFactor()
+    {
+        lerpTimer += Time.deltaTime;
+        if (lerpTimer > afterglowDuration) lerpTimer = afterglowDuration;
+
+        //timer += Time.deltaTime;
+        emissionFactor = Mathf.PingPong(Time.time * bpm_forGlow / 60f, 1f);
+        emissionFactor = curve.Evaluate(emissionFactor);
+        emissionFactor = Mathf.Lerp(minMaxEmission.x, minMaxEmission.y, emissionFactor);
+
+        // lerp color to the basic color
+        lastLightedColor = Color.Lerp(lastLightedColor, basic, lerpTimer / afterglowDuration);
+
+        // set the color
+        m_meshR.material.SetColor("_EmissionColor", lastLightedColor * emissionFactor);
+        RendererExtensions.UpdateGIMaterials(m_meshR);
+    }
+
+    void HandleKeyInput()
+    {
+        if (!string.IsNullOrEmpty(triggerKey))
+        {
+            if (Input.GetKeyDown(triggerKey))
+            {
+                lastLightedColor = lighted;
+                KeyEvent.Send(this, true);
+                lerpTimer = 0f;
+            }
+            else if (Input.GetKeyUp(triggerKey))
+            {
+                KeyEvent.Send(this, false);
+            }
+            // manage lighting
+            if (Input.GetKey(triggerKey))
+            {
+                m_meshR.material.SetColor("_EmissionColor", lastLightedColor * emissionFactor);
+                RendererExtensions.UpdateGIMaterials(m_meshR);
             }
         }
-
-        //DynamicGI.UpdateEnvironment();
     }
 }
