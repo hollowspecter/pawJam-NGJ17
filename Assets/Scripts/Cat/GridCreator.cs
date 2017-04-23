@@ -9,6 +9,8 @@ public class GridCreator :MonoBehaviour {
 
     [SerializeField]
     private float[] offsets;
+    [SerializeField]
+    private bool initiliase = true;
 
     public GameObject cell;
     private ArrayList m_cells;
@@ -39,24 +41,38 @@ public class GridCreator :MonoBehaviour {
 
         m_cells = new ArrayList();
 
-        //Dimensions because 1x1x1 Plane is actually 10 long
-        //magic numbers, yay
-        float cellDimensionX = levelSize.width / 9.0f;
-        float cellDimensionY = levelSize.height / 4.0f;
+        // init and create the tiles
+        if (initiliase)
+        {
+            //Dimensions because 1x1x1 Plane is actually 10 long
+            //magic numbers, yay
+            float cellDimensionX = levelSize.width / 9.0f;
+            float cellDimensionY = levelSize.height / 4.0f;
 
-        int count = 0;
-        for(int i = 0; i < 4;++i) {
-            for(int j = 0; j < 9; ++j) {
-                //Debug.Log(i+"|"+j+ "   :"+baseKeys[i, j]);
+            int count = 0;
+            for(int i = 0; i < 4;++i) {
+                for(int j = 0; j < 9; ++j) {
+                    //Debug.Log(i+"|"+j+ "   :"+baseKeys[i, j]);
 
-                Vector3 currentPos = new Vector3(offsets[i] + (0.5f * cellDimensionX) + (j * cellDimensionX) + levelSize.xMin, 0.0f, ((3-i) * cellDimensionY) + (0.5f * cellDimensionY)+ levelSize.yMin);
-                GameObject current = Instantiate(cell, currentPos, cell.transform.rotation);
-                current.transform.localScale = new Vector3(cellDimensionX, cellDimensionY, 1.0f);
-                current.name = i + "|" + j;
-                current.transform.SetParent(transform);
-                m_cells.Add(current);
-                count++;
+                    Vector3 currentPos = new Vector3(offsets[i] + (0.5f * cellDimensionX) + (j * cellDimensionX) + levelSize.xMin, 0.0f, ((3-i) * cellDimensionY) + (0.5f * cellDimensionY)+ levelSize.yMin);
+                    GameObject current = Instantiate(cell, currentPos, cell.transform.rotation);
+                    current.transform.localScale = new Vector3(cellDimensionX, cellDimensionY, 1.0f);
+                    current.name = i + "|" + j;
+                    current.transform.SetParent(transform);
+                    m_cells.Add(current);
+                    count++;
+                }
             }
+        }
+        // else just find the tiles and fill the arraylist
+        else
+        {
+            Transform[] cells = GetComponentsInChildren<Transform>();
+            for (int i = 1; i < cells.Length; ++i)
+            {
+                m_cells.Add(cells[i].gameObject);
+            }
+            print(m_cells.Count);
         }
         assignKeys(baseKeys);
 
