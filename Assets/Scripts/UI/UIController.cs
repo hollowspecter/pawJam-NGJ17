@@ -60,8 +60,8 @@ public class UIController : MonoBehaviour {
             txt.text = "";
         }
 
-        for(int i = 0; i < 9; ++i) {
-            Text txt = scoreboard[i / 3];
+        for(int i = 1; i < 10; ++i) {
+            Text txt = scoreboard[(i-1) / 3];
             if(GameManager.Instance.Points.ContainsKey(i)) {
                 txt.text += GameManager.Instance.Points[i];
             }

@@ -68,14 +68,11 @@ public class GameManager : MonoBehaviour {
         int mouseAlive = animator.GetInteger(animID_MiceAlive);
         mouseAlive = mouseAlive > 0 ? mouseAlive-1 : 0;
         animator.SetInteger(animID_MiceAlive, mouseAlive);
-        MouseController msc = mouse.GetComponent<MouseController>();
-        int controllerNum = msc.ControllerNumber;
 
         var changes = new List<int>();
-        foreach(int i in m_points.Keys) {
-            if (i != controllerNum)
-                changes.Add(i);
-                //m_points[i]++;
+        foreach(MouseController msc in GameObject.FindObjectsOfType<MouseController>()) {
+            if (!msc.Dead)
+                changes.Add(msc.ControllerNumber);
         }
         foreach (int c in changes) m_points[c]++;
     }
@@ -104,7 +101,6 @@ public class GameManager : MonoBehaviour {
         }
 
         SceneManager.LoadScene(1); // simply loads the scene after this
-        Debug.Log(m_playerCount);
         animator.SetTrigger(animID_StartGame);
         
     }

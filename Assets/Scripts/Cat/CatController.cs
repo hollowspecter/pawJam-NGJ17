@@ -112,11 +112,11 @@ public class CatController :MonoBehaviour {
         if (!cell)
             return;
 
-        if (triggered) {
+        if (triggered && !m_pressedKeys.Contains(cell)) {
             m_pressedKeys.Add(cell);
         }
         else {
-            if (m_pressedKeys.Contains(cell))
+            while (m_pressedKeys.Contains(cell))
                 m_pressedKeys.Remove(cell);
         }
     }
